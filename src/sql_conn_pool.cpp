@@ -13,12 +13,7 @@ sql_conn_pool *sql_conn_pool::get_instance() {
 
 void sql_conn_pool::init(const char *url, const char *user, const char *passwd, const char *dbname,
         int port, int maxconn, bool close_log) {
-    strcpy(m_url, url);
-    strcpy(m_user, user);
-    strcpy(m_passwd, passwd);
-    strcpy(m_dbname, dbname);
-    m_port = port;
-    m_maxn = maxconn;
+    m_num_max = maxconn;
     m_close_log = close_log;
 
     for (int i = 0; i < maxconn; ++i) {
@@ -46,7 +41,7 @@ MYSQL *sql_conn_pool::get_conn() {
     reserve.wait();
     MYSQL *con = pool.front();
     pool.pop_front();
-    ++m_curn;
+    ++m_num_used;
     mutex.unlock();
     return con;
 }
@@ -56,7 +51,7 @@ bool sql_conn_pool::release_conn(MYSQL *con) {
         return true;
     mutex.lock();
     pool.push_back(con);
-    --m_curn;
+    --m_num_used;
     reserve.post();
     mutex.unlock();
     return true;

@@ -6,8 +6,8 @@
 #include <queue>
 
 class sql_conn_pool {
-    int m_maxn;
-    int m_curn;
+    int m_num_max;
+    int m_num_used;
     locker mutex;
     std::deque<MYSQL *> pool;
     sem reserve;
@@ -16,11 +16,6 @@ class sql_conn_pool {
     ~sql_conn_pool();
 
 public:
-    char m_url[128];
-    int m_port;
-    char m_user[128];
-    char m_passwd[128];
-    char m_dbname[128];
     bool m_close_log;
 
     static sql_conn_pool *get_instance();
